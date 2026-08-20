@@ -27,19 +27,21 @@ export class CoffeeMenuPage {
   }
 
   private coffeeTitle(name: string): Locator {
-  return this.page
-    .locator('h4')
-    .filter({ hasText: name });
+    return this.page.locator('h4').filter({
+      hasText: new RegExp(`^${escapeRegExp(name)}\\s*\\$`)
+    });
   }
 
   async goto(): Promise<void> {
     await this.page.goto('/');
+
     await expect(this.checkoutButton).toBeVisible();
     await expect(this.coffeeCup('Espresso')).toBeVisible();
   }
 
   async addProduct(name: string): Promise<void> {
     const coffee = this.coffeeCup(name);
+
     await expect(coffee).toBeVisible();
     await coffee.click();
   }
@@ -58,35 +60,68 @@ export class CoffeeMenuPage {
 
     const button =
       action === 'accept'
-        ? this.promo.getByRole('button', { name: 'Yes, of course!' })
-        : this.promo.getByRole('button', { name: "Nah, I'll skip." });
+        ? this.promo.getByRole('button', {
+            name: 'Yes, of course!'
+          })
+        : this.promo.getByRole('button', {
+            name: "Nah, I'll skip."
+          });
 
     await button.click();
+
     await expect(this.promo).toBeHidden();
   }
 
   async translateTitle(name: string): Promise<void> {
-    await this.coffeeTitle(name).dblclick();
+    const title = this.coffeeTitle(name);
+
+    await expect(title).toBeVisible();
+    await title.dblclick();
   }
 
-  async expectTranslatedTitle(translation: string): Promise<void> {
-  await expect(
-    this.page
+  async expectTranslatedTitle(
+    translation: string
+  ): Promise<void> {
+    const translatedTitle = this.page
       .locator('h4')
-      .filter({ hasText: translation })
-  ).toBeVisible();
+      .filter({
+        hasText: new RegExp(
+          `^${escapeRegExp(translation)}\\s*\\$`
+        )
+      });
+
+    await expect(translatedTitle).toBeVisible();
   }
 
-  async openAddToCartDialog(name: string): Promise<void> {
-    await this.coffeeCup(name).click({ button: 'right' });
+  async openAddToCartDialog(
+    name: string
+  ): Promise<void> {
+    const coffee = this.coffeeCup(name);
+
+    await expect(coffee).toBeVisible();
+
+    await coffee.click({
+      button: 'right'
+    });
+
     await expect(this.addToCartDialog).toBeVisible();
   }
 
   async confirmAddToCartDialog(): Promise<void> {
     await this.addToCartDialog
-      .getByRole('button', { name: 'Yes', exact: true })
+      .getByRole('button', {
+        name: 'Yes',
+        exact: true
+      })
       .click();
 
     await expect(this.addToCartDialog).toBeHidden();
   }
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(
+    /[.*+?^${}()|[\]\\]/g,
+    '\\$&'
+  );
 }
