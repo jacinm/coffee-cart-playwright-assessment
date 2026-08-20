@@ -3,20 +3,26 @@ import { expect, Locator, Page } from '@playwright/test';
 export type PromoAction = 'accept' | 'skip';
 
 export class CoffeeMenuPage {
-  constructor(private readonly page: Page) {}
+  readonly page: Page;
+  readonly checkoutButton: Locator;
+  readonly promo: Locator;
+  readonly addToCartDialog: Locator;
 
-  readonly checkoutButton = this.page.getByRole('button', {
-    name: 'Proceed to checkout'
-  });
+  constructor(page: Page) {
+    this.page = page;
 
-  readonly promo = this.page.locator('.promo');
+    this.checkoutButton = this.page.getByRole('button', {
+      name: 'Proceed to checkout'
+    });
 
-  readonly addToCartDialog = this.page.locator(
-    'dialog[data-cy="add-to-cart-modal"]'
-  );
+    this.promo = this.page.locator('.promo');
+
+    this.addToCartDialog = this.page.locator(
+      'dialog[data-cy="add-to-cart-modal"]'
+    );
+  }
 
   private coffeeCup(name: string): Locator {
-    // Coffee Cart exposes each cup with aria-label="<coffee name>".
     return this.page.getByLabel(name, { exact: true });
   }
 
