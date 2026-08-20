@@ -1,0 +1,19 @@
+{
+  "name": "coffee-cart-playwright",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Playwright TypeScript assessment framework for Coffee Cart",
+  "scripts": {
+    "test": "playwright test",
+    "test:smoke": "playwright test tests/checkout.spec.ts",
+    "test:bonus": "playwright test tests/bonus.spec.ts",
+    "test:headed": "playwright test --headed",
+    "test:report": "playwright show-report",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}

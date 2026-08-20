@@ -1,0 +1,88 @@
+import { expect, Locator, Page } from '@playwright/test';
+
+export type PromoAction = 'accept' | 'skip';
+
+export class CoffeeMenuPage {
+  constructor(private readonly page: Page) {}
+
+  readonly checkoutButton = this.page.getByRole('button', {
+    name: 'Proceed to checkout'
+  });
+
+  readonly promo = this.page.locator('.promo');
+
+  readonly addToCartDialog = this.page.locator(
+    'dialog[data-cy="add-to-cart-modal"]'
+  );
+
+  private coffeeCup(name: string): Locator {
+    // Coffee Cart exposes each cup with aria-label="<coffee name>".
+    return this.page.getByLabel(name, { exact: true });
+  }
+
+  private coffeeTitle(name: string): Locator {
+    return this.page.getByRole('heading', {
+      name,
+      exact: true
+    });
+  }
+
+  async goto(): Promise<void> {
+    await this.page.goto('/');
+    await expect(this.checkoutButton).toBeVisible();
+    await expect(this.coffeeCup('Espresso')).toBeVisible();
+  }
+
+  async addProduct(name: string): Promise<void> {
+    const coffee = this.coffeeCup(name);
+    await expect(coffee).toBeVisible();
+    await coffee.click();
+  }
+
+  async checkout(): Promise<void> {
+    await expect(this.checkoutButton).toBeEnabled();
+    await this.checkoutButton.click();
+  }
+
+  async expectPromoVisible(): Promise<void> {
+    await expect(this.promo).toBeVisible();
+  }
+
+  async handlePromo(action: PromoAction): Promise<void> {
+    await this.expectPromoVisible();
+
+    const button =
+      action === 'accept'
+        ? this.promo.getByRole('button', { name: 'Yes, of course!' })
+        : this.promo.getByRole('button', { name: "Nah, I'll skip." });
+
+    await button.click();
+    await expect(this.promo).toBeHidden();
+  }
+
+  async translateTitle(name: string): Promise<void> {
+    await this.coffeeTitle(name).dblclick();
+  }
+
+  async expectTranslatedTitle(translation: string): Promise<void> {
+    await expect(
+      this.page.getByRole('heading', {
+        name: translation,
+        exact: true
+      })
+    ).toBeVisible();
+  }
+
+  async openAddToCartDialog(name: string): Promise<void> {
+    await this.coffeeCup(name).click({ button: 'right' });
+    await expect(this.addToCartDialog).toBeVisible();
+  }
+
+  async confirmAddToCartDialog(): Promise<void> {
+    await this.addToCartDialog
+      .getByRole('button', { name: 'Yes', exact: true })
+      .click();
+
+    await expect(this.addToCartDialog).toBeHidden();
+  }
+}
