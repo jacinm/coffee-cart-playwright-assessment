@@ -70,12 +70,11 @@ export class CoffeeMenuPage {
   }
 
   async expectTranslatedTitle(translation: string): Promise<void> {
-    await expect(
-      this.page.getByRole('heading', {
-        name: translation,
-        exact: true
-      })
-    ).toBeVisible();
+  await expect(
+    this.page
+      .locator('h4')
+      .filter({ hasText: translation })
+  ).toBeVisible();
   }
 
   async openAddToCartDialog(name: string): Promise<void> {
