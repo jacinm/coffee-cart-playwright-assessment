@@ -1,25 +1,33 @@
-import { expect, Page } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 import { testData } from '../data/test-data';
 
 export class PaymentDetailsPage {
-  constructor(private readonly page: Page) {}
+  private readonly page: Page;
+  private readonly paymentForm: Locator;
+  private readonly nameInput: Locator;
+  private readonly emailInput: Locator;
+  private readonly submitButton: Locator;
 
-  private readonly paymentForm = this.page.getByRole('form', {
-    name: 'Payment form'
-  });
+  constructor(page: Page) {
+    this.page = page;
 
-  private readonly nameInput = this.paymentForm.getByLabel('Name', {
-    exact: true
-  });
+    this.paymentForm = this.page.getByRole('form', {
+      name: 'Payment form'
+    });
 
-  private readonly emailInput = this.paymentForm.getByLabel('Email', {
-    exact: true
-  });
+    this.nameInput = this.paymentForm.getByLabel('Name', {
+      exact: true
+    });
 
-  private readonly submitButton = this.paymentForm.getByRole('button', {
-    name: 'Submit',
-    exact: true
-  });
+    this.emailInput = this.paymentForm.getByLabel('Email', {
+      exact: true
+    });
+
+    this.submitButton = this.paymentForm.getByRole('button', {
+      name: 'Submit',
+      exact: true
+    });
+  }
 
   async expectVisible(): Promise<void> {
     await expect(
