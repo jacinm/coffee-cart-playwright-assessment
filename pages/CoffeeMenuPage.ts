@@ -27,10 +27,9 @@ export class CoffeeMenuPage {
   }
 
   private coffeeTitle(name: string): Locator {
-    return this.page.getByRole('heading', {
-      name,
-      exact: true
-    });
+  return this.page
+    .locator('h4')
+    .filter({ hasText: name });
   }
 
   async goto(): Promise<void> {
